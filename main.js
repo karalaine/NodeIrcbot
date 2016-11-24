@@ -30,10 +30,11 @@ function checkForDb(url, nick) {
 
 function loadUrl(url) {
     request(url, function (error, response, body) {
-        if (!error && response.statusCode == 200) { 
+        if (!error && response.statusCode == 200 && response.headers['content-type'].indexOf('text/html') !== -1) { 
             var $ = cheerio.load(body);
             var title = $('title').text();
             if (title) {
+                title = title.replace(/(\r\n|\n|\r)/gm, " ");
                 client.say(config.channel, "URL: " + title);
             }
         }
