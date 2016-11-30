@@ -29,8 +29,9 @@ function checkForDb(url, nick) {
 }
 
 function loadUrl(url) {
-    request(url, function (error, response, body) {
-        if (!error && response.statusCode == 200 && response.headers['content-type'].indexOf('text/html') !== -1) { 
+    var body = "";
+    var req = request(url, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
             var $ = cheerio.load(body);
             var title = $('title').first().text();
             if (title) {
@@ -38,7 +39,20 @@ function loadUrl(url) {
                 client.say(config.channel, "URL: " + title);
             }
         }
-    })
+    }).on('data', function (data) {
+        // decompressed data as it is received
+        body = body + data;
+        var $ = cheerio.load(body);
+        var title = $('title').text();
+        if (title) {
+            title = title.replace(/(\r\n|\n|\r)/gm, " ");
+            client.say(config.channel, "URL: " + title);
+            req.abort();
+        }
+    }).on('response', function (response) {
+        if (response.headers['content-type'].indexOf('text/html') == -1)
+            req.abort();
+    });
 }
 
 var client = new irc.Client(config.server, config.botName, {
