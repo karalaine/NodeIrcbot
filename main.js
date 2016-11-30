@@ -32,9 +32,9 @@ function loadUrl(url) {
     request(url, function (error, response, body) {
         if (!error && response.statusCode == 200 && response.headers['content-type'].indexOf('text/html') !== -1) { 
             var $ = cheerio.load(body);
-            var title = $('title').text();
+            var title = $('title').first().text();
             if (title) {
-                title = title.replace(/(\r\n|\n|\r)/gm, " ");
+                title = title.replace(/\s\s+/g, " ").trim();
                 client.say(config.channel, "URL: " + title);
             }
         }
