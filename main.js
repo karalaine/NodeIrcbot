@@ -32,22 +32,28 @@ function checkForDb(url, nick) {
 function loadUrl(url) {
     var body = "";
     var req = request({url: url, encoding: null})
-	.pipe(new AutoDetectDecoderStream())
-	.on('data', function(chunk) {
-	   body += chunk;
-	})
-        .on('end',function() {
-            var $ = cheerio.load(body);
-            var title = $('title');
-            if (title) {
-		title = title.first().text();
-                title = title.replace(/\s\s+/g, " ").trim();
-                client.say(config.channel, "URL: " + title);
-            }
-    }).on('response', function (response) {
-        if (response.headers['content-type'].indexOf('text/html') == -1)
-            req.abort();
-    });
+	.on('response', function (response)
+	{
+            if (response.headers['content-type'].indexOf('text/html') == -1)
+            {
+		req.abort();
+	    }
+	    else {
+		req.pipe(new AutoDetectDecoderStream())
+		    .on('data', function(chunk) {
+	   		body += chunk;
+		    })
+		    .on('end',function() {
+			var $ = cheerio.load(body);
+			var title = $('title');
+			if (title) {
+			    title = title.first().text();
+			    title = title.replace(/\s\s+/g, " ").trim();
+			    client.say(config.channel, "URL: " + title);
+			}
+		    });
+	    }
+	});
 }
 
 var client = new irc.Client(config.server, config.botName, {
