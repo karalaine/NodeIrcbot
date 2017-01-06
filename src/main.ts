@@ -8,9 +8,9 @@ import _ = require('underscore');
 var AutoDetectDecoderStream = require('autodetect-decoder-stream');
 
 var config = {
-    channel: "#mikonkannu",
-    server: "chat.freenode.net",
-    botName: "TestiNode"
+    channel: "#kctite09",
+    server: "irc.quakenet.org",
+    botName: "JormaNode"
 };
 
 var db = new sqlite3.Database('urldb');
