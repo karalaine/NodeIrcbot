@@ -42,28 +42,35 @@ function checkForDb(url, nick) {
 
 function loadUrl(url: string) {
     var body = "";
-    var req = request({url: url, encoding: null})
-	.on('response', function (response)
-	{
-        if (response.headers['content-type'].indexOf('text/html') == -1) {
-            req.abort();
-        }
-        else {
-            req.pipe(new AutoDetectDecoderStream())
-                .on('data', function(chunk) {
-                    body += chunk;
-                })
-                .on('end',function() {
-                    var $ = cheerio.load(body);
-                    var titleElem = $('title');
-                    if (titleElem) {
-                        var title = titleElem.first().text();
-                        title = title.replace(/\s\s+/g, " ").trim();
-                        client.say(config.channel, "URL: " + title);
-                    }
-                });
-        }
-	});
+    try
+    {
+        var req = request({url: url, encoding: null})
+        .on('response', function (response)
+        {
+            if (response.headers['content-type'].indexOf('text/html') == -1) {
+                req.abort();
+            }
+            else {
+                req.pipe(new AutoDetectDecoderStream())
+                    .on('data', function(chunk) {
+                        body += chunk;
+                    })
+                    .on('end',function() {
+                        var $ = cheerio.load(body);
+                        var titleElem = $('title');
+                        if (titleElem) {
+                            var title = titleElem.first().text();
+                            title = title.replace(/\s\s+/g, " ").trim();
+                            client.say(config.channel, "URL: " + title);
+                        }
+                    });
+            }
+        });
+    }
+    catch(err)
+    {
+        //Ignore
+    }
 }
 
 
