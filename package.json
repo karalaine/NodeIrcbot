@@ -2,9 +2,12 @@
   "dependencies": {
     "autodetect-decoder-stream": "^1.0.0",
     "cheerio": "^0.22.0",
+    "fs-ext": "^0.5.0",
     "irc": "^0.5.1",
+    "querystring": "^0.2.0",
     "request": "^2.79.0",
     "sqlite3": "^3.1.8",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "xml2js": "^0.4.17"
   }
 }
