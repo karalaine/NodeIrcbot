@@ -11,6 +11,7 @@ import querystring = require('querystring');
 import iconv = require('iconv-lite');
 import jschardet = require('jschardet');
 import charset = require('charset');
+var fs = require('fs-ext');
 
 var config = {
     channel: "#kctite09",
@@ -302,19 +303,34 @@ function checkForCommand(message: String, from: String) {
     }
 }
 
-var client = new irc.Client(config.server, config.botName, {
-    channels: [config.channel]
-});
+var fd = fs.openSync('/home/ubuntu/.oidentd.conf', 'w+');
 
-client.addListener('message#', function(from, to, message) {
-    console.log(from + ' => ' + to + ': ' + message);
+fs.flockSync(fd, 'ex');
+    
+    fs.writeSync(fd, 'global { reply \"jorma\" }');    	
 
-    if(checkForUrl(message, from) == false)
-    {
-        checkForCommand(message, from);
-    } 
-});
+    var client = new irc.Client(config.server, config.botName, {
+         channels: [config.channel]
+    });
 
-client.addListener('pm', function(from, message) {
-    console.log(from + ' => ME: ' + message);
-});
+    client.addListener('message#', function(from, to, message) {
+        console.log(from + ' => ' + to + ': ' + message);
+
+	if(checkForUrl(message, from) == false)
+	{
+	    checkForCommand(message, from);
+        } 
+    });
+
+    client.addListener('pm', function(from, message) {
+	 console.log(from + ' => ME: ' + message);
+    });
+
+    client.addListener('registered', function(message) {
+	fs.truncateSync(fd);
+        fs.flock(fd, 'un', function(err) {
+            if (err) {
+	        return console.log("Couldn't unlock file, too bad");
+            }	
+       });
+   });
