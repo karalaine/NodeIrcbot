@@ -43,35 +43,34 @@ function checkForDb(url, nick) {
 }
 
 function loadUrl(url: string) {
-    var body = "";
     try
     {
-        var req = request({url: url, encoding: null, method: "GET" })
+        var req = request({url: url, encoding: null, method: "GET" },
+            function (error, response, body)
+            {
+                jschardet.Constants._debug = true;
+                var charSet = charset(response.headers, body); 
+                charSet = charSet || jschardet.detect(body).encoding.toLowerCase();
+                if(charSet !== 'utf8')
+                {
+                     console.log("Convert");
+                     body = iconv.decode(body, charSet);
+                }    
+                    
+                var $ = cheerio.load(body);
+                var titleElem = $('title');
+                if (titleElem) {
+                    var title = titleElem.first().text();
+                    title = title.replace(/\s\s+/g, " ").trim();
+                    client.say(config.channel, "URL: " + title);
+                }
+            }
+        )
         .on('response', function (response)
         {
             if (response.headers['content-type'].indexOf('text/html') == -1) {
+                console.log("Abort");
                 req.abort();
-            }
-            else {
-                req.on('data', function(chunk) {
-                        body += chunk;
-                    })
-                    .on('end',function() {
-                        var buffer = new Buffer(body);
-                        jschardet.Constants._debug = true;
-                        var charSet = charset(response.headers.headers, buffer); 
-                        console.log("charset returned: " + charSet);
-                        charSet = charSet || jschardet.detect(buffer).encoding.toLowerCase();
-                        console.log("Detected encoding: " + charSet);
-                        var utfData = iconv.decode(buffer, charSet);
-                        var $ = cheerio.load(utfData);
-                        var titleElem = $('title');
-                        if (titleElem) {
-                            var title = titleElem.first().text();
-                            title = title.replace(/\s\s+/g, " ").trim();
-                            client.say(config.channel, "URL: " + title);
-                        }
-                    });
             }
         });
     }
