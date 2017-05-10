@@ -1,10 +1,20 @@
 {
   "dependencies": {
+    "@types/node": "^7.0.18",
+    "async": "^2.1.4",
     "autodetect-decoder-stream": "^1.0.0",
+    "charset": "^1.0.0",
     "cheerio": "^0.22.0",
+    "gulp": "^3.9.1",
     "irc": "^0.5.1",
+    "jquery": "^3.1.1",
+    "najax": "^0.7.1",
+    "querystring": "^0.2.0",
     "request": "^2.79.0",
     "sqlite3": "^3.1.8",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "xml2js": "^0.4.17",
+    "xmldom": "^0.1.27",
+    "xpath": "0.0.23"
   }
 }

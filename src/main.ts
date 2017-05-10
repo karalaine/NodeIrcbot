@@ -7,8 +7,10 @@ import cheerio  = require('cheerio');
 import _ = require('underscore');
 var AutoDetectDecoderStream = require('autodetect-decoder-stream');
 var xml2js = require('xml2js').parseString;
-import querystring = require('querystring')
-
+import querystring = require('querystring');
+import iconv = require('iconv-lite');
+import jschardet = require('jschardet');
+import charset = require('charset');
 
 var config = {
     channel: "#kctite09",
@@ -44,19 +46,25 @@ function loadUrl(url: string) {
     var body = "";
     try
     {
-        var req = request({url: url, encoding: null})
+        var req = request({url: url, encoding: null, method: "GET" })
         .on('response', function (response)
         {
             if (response.headers['content-type'].indexOf('text/html') == -1) {
                 req.abort();
             }
             else {
-                req.pipe(new AutoDetectDecoderStream())
-                    .on('data', function(chunk) {
+                req.on('data', function(chunk) {
                         body += chunk;
                     })
                     .on('end',function() {
-                        var $ = cheerio.load(body);
+                        var buffer = new Buffer(body);
+                        jschardet.Constants._debug = true;
+                        var charSet = charset(response.headers.headers, buffer); 
+                        console.log("charset returned: " + charSet);
+                        charSet = charSet || jschardet.detect(buffer).encoding.toLowerCase();
+                        console.log("Detected encoding: " + charSet);
+                        var utfData = iconv.decode(buffer, charSet);
+                        var $ = cheerio.load(utfData);
                         var titleElem = $('title');
                         if (titleElem) {
                             var title = titleElem.first().text();
