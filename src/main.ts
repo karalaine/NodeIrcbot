@@ -115,6 +115,14 @@ function checkForUrl(message: String, from: String)
         endPos = message.length;
 
     var url = message.substr(pos, endPos);
+
+    var imgUr = url.indexOf("i.imgur");
+    if(imgUr !== -1)
+    {
+        url = url.replace("i.imgur", "imgur");
+        var extension = url.lastIndexOf(".");
+        url = url.substr(0, extension);
+    }
     loadUrl(url);
     checkForDb(url, from);
     return true;
