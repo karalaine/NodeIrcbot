@@ -50,6 +50,7 @@ function loadUrl(url: string) {
   var body = "";
   var req = request({
     url: url,
+    rejectUnauthorized: false,
     encoding: null
   }).on("response", function(response) {
     if (response.headers["content-type"].indexOf("text/html") == -1) {
