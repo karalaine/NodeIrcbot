@@ -71,7 +71,7 @@ function loadUrl(url: string) {
         }
       }
     ).on("response", function(response) {
-      if (response.headers["content-type"].indexOf("text/html") == -1) {
+      if (response.headers["content-type"] && response.headers["content-type"].indexOf("text/html") == -1) {
         console.log("Abort");
         req.abort();
       }
